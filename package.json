@@ -1,0 +1,23 @@
+{
+  "name": "skeleton",
+  "version": "1.0.0",
+  "description": "skeloeton for MEAN stack app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "noode": "4.2.4",
+    "npm": "2.14.12"
+  },
+  "author": "Finch",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4",
+    "jade": "^1.11.0",
+    "mongoose": "^4.4.4",
+    "morgan": "^1.7.0",
+    "stylus": "^0.53.0"
+  }
+}
