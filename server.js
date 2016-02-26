@@ -1,65 +1,94 @@
 var express = require('express'),
-    bodyParser = require('body-parser'),
-    logger = require('morgan'),
-    stylus = require('stylus'),
-    mongoose = require('mongoose');
+    mongoose = require('mongoose'),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy;
 
 var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
+var config = require('./server/config/config')[env];
+
 var app = express();
 
-function compile(src, path) {
-    return stylus(src).set('filename', path);
-}
+require('./server/config/express')(app, config);
 
-// app.set
-app.set('views', __dirname + '/server/views');
-app.set('view engine', 'jade');
-// end of ---> app.set
+require('./server/config/mongoose')(config);
 
-// app.use
-app.use(express.static(__dirname + '/public'));
-app.use(bodyParser.json());
-app.use(stylus.middleware(
-    {
-        src: __dirname + '/public',
-        compile: compile
-    }
-));
-app.use(logger('dev'));
-// end of ---> app.use
+// dont wotks v3
+/*var User = mongoose.model('User');
+// use static authenticate method of model in LocalStrategy
+passport.use(new LocalStrategy(User.authenticate()));
 
-// mongodb
-if (env === 'development') {
-    mongoose.connect('mongodb://localhost/multivision');
-} else {
-    mongoose.connect('mongodb://theFinch:lukazz1989@ds055895.mongolab.com:55895/the_finch_multivision');
-}
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error...'));
-db.once('open', function () {
-    console.log('connected to multivision');
+// use static serialize and deserialize of model for passport session support
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());*/
+
+
+// workrs v1
+/*var User = mongoose.model('User');
+passport.use(new LocalStrategy( function(username,password,done) {
+    User.findOne({userName: username}, function (err, user) {
+        if (err) {
+            return done(err);
+        }
+        if (!user) {
+            return done(null, false);
+        }
+        /!* if (!user.verifyPassword(password)) {
+         return done(null, false, {
+         message: 'Incorrect password.'
+         });
+         }*!/
+        return done(null, user);
+    });
+}));
+
+passport.serializeUser(function(user, done) {
+    done(null, user._id);
+    // if you use Model.id as your idAttribute maybe you'd want
+    // done(null, user.id);
 });
-var mongooseSchema = mongoose.Schema({message: String});
-var message = mongoose.model('message', mongooseSchema);
-var mongoMessage;
-message.findOne().exec(function (err, data) {
-    mongoMessage = data.message;
-    console.log(mongoMessage);
+
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+        done(err, user);
+    });
+});*/
+
+// workrs v1
+var User = mongoose.model('User');
+passport.use(new LocalStrategy(
+    function (username, password, done) {
+        User.findOne({
+            username: username
+        }, function (err, user) {
+            if (err) {
+                return done(err);
+            }
+            if (!user) {
+                return done(null, false, {
+                    message: 'Incorrect username.'
+                });
+            }
+           /* if (!user.verifyPassword(password)) {
+                return done(null, false, {
+                    message: 'Incorrect password.'
+                });
+            }*/
+            return done(null, user);
+        });
+    }));
+
+
+passport.serializeUser(function (user, done) {
+    done(null, user);
 });
-// ned of ---> mongodb
 
-// routes
-app.get('/partials/:partialPath', function (req, res) {
-    res.render('partials/' + req.params.partialPath);
-})
-
-app.get('*', function (req, res) {
-    res.render('index', {mongoMessage: mongoMessage});
+passport.deserializeUser(function (user, done) {
+    done(null, user);
 });
-// end of ---> routes
 
-var port = process.env.PORT || 3000;
-app.listen(port, function () {
-    console.log('Listen on port 3000');
+require('./server/config/routes')(app);
+
+app.listen(config.port, function () {
+    console.log('Listen on port ' + config.port);
 });
