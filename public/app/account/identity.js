@@ -2,9 +2,15 @@ angular
     .module('app')
     .factory('identity', identity);
 
-function identity() {
+identity.$inject = ['$window'];
+
+function identity($window) {
+    var currentUser;
+    if (!!$window.bootstrapedUserObj) {
+        currentUser = $window.bootstrapedUserObj;
+    }
     return {
-        currentUser:undefined,
+        currentUser: currentUser,
         isAuthenticated: isAuthenticated
     };
 
