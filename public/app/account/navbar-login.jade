@@ -5,11 +5,13 @@
         .form-group
             input.form-control(placeholder="Password", type="password", ng-model="user.password")
         button.btn.btn-primary(ng-click="signIn()") Singn In
-    ul.nav.anvbar.navbar-right(ng-show="identity.isAuthenticated()")
+    ul.nav.navbar.navbar-right(ng-show="identity.isAuthenticated()")
         li.dropdown
             a.dropdown-toggle(href="" data-toggle="dropdown")
                 | {{identity.currentUser.firstName + " " + identity.currentUser.lastName}}
                 b.caret
             ul.dropdown-menu
+                li(ng-show="identity.currentUser.isAdmin()")
+                    a(href='/admin/users') User Admin
                 li
-                    a(href="", ng-click="lobOut()") Sign Out
+                    a(href="", ng-click="logOut()") Sign Out

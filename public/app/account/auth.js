@@ -2,9 +2,9 @@ angular
     .module('app')
     .factory('auth', auth);
 
-auth.$inject = ['$http', '$q', 'identity'];
+auth.$inject = ['$http', '$q', 'identity', 'mvUser'];
 
-function auth($http, $q, identity) {
+function auth($http, $q, identity, mvUser) {
 
     return {
         authenticateUser: authenticateUser,
@@ -16,7 +16,9 @@ function auth($http, $q, identity) {
         $http.post('/login', {username: username, password: password})
             .then(function (response) {
                 if (response.data.success) {
-                    identity.currentUser = response.data.user;
+                    var user = new mvUser();
+                    angular.extend(user, response.data.user);
+                    identity.currentUser = user;
                     dfd.resolve(true);
                 } else {
                     dfd.resolve(false);

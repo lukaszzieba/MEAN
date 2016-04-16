@@ -2,12 +2,12 @@ angular
     .module('app')
     .factory('identity', identity);
 
-identity.$inject = ['$window'];
+identity.$inject = ['$window', 'mvUser'];
 
-function identity($window) {
-    var currentUser;
+function identity($window, mvUser) {
+    var currentUser = new mvUser();
     if (!!$window.bootstrapedUserObj) {
-        currentUser = $window.bootstrapedUserObj;
+        angular.extend(currentUser, $window.bootstrapedUserObj);
     }
     return {
         currentUser: currentUser,
@@ -15,6 +15,10 @@ function identity($window) {
     };
 
     function isAuthenticated() {
+        // my addon
+        if(!this.currentUser.firstName){
+            return false;
+        }
         return !!this.currentUser;
     }
 }

@@ -20,7 +20,7 @@ function AccountController($scope, $location, notifier, auth, identity) {
             });
     }
 
-    $scope.lobOut = function() {
+    $scope.logOut = function() {
         auth.logOutUsrer()
             .then( function ()
             {

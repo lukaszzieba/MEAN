@@ -31,7 +31,7 @@ module.exports = function (app, config) {
             src: config.rootPath + '/public',
             compile: compile
         }
-    ));
+    ))
     app.use(logger('dev'));
     // end of ---> app.use
 };
