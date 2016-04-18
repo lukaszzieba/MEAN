@@ -11,14 +11,20 @@ function identity($window, mvUser) {
     }
     return {
         currentUser: currentUser,
-        isAuthenticated: isAuthenticated
+        isAuthenticated: isAuthenticated,
+        isAuthorized: isAuthorized
     };
 
     function isAuthenticated() {
         // my addon
-        if(!this.currentUser.firstName){
+        if(this.currentUser === undefined ||  !this.currentUser.hasOwnProperty('firstName')) {
             return false;
+        } else {
+            return !!this.currentUser;
         }
-        return !!this.currentUser;
+    }
+
+    function  isAuthorized(role) {
+        return this.currentUser && this.currentUser.roles.indexOf(role) > -1
     }
 }

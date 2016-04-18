@@ -8,7 +8,11 @@ function auth($http, $q, identity, mvUser) {
 
     return {
         authenticateUser: authenticateUser,
-        logOutUsrer: logOutUsrer
+        logOutUsrer: logOutUsrer,
+        authorizeCurrentUserForRoute: authorizeCurrentUserForRoute,
+        createUser: createUser,
+        authorizeAuthenticateUserForRoute: authorizeAuthenticateUserForRoute,
+        updateCurrentUser: updateCurrentUser
     }
 
     function authenticateUser(username, password) {
@@ -36,4 +40,49 @@ function auth($http, $q, identity, mvUser) {
             });
         return dfd.promise;
     }
+
+    function authorizeCurrentUserForRoute(role) {
+        if(identity.isAuthorized(role)) {
+            return true;
+        } else {
+            return $q.reject('not authorized');
+        }
+    }
+
+    function authorizeAuthenticateUserForRoute() {
+        if(identity.isAuthenticated()) {
+            return true;
+        }else {
+            return $q.reject('not authorized');
+        }
+    }
+
+    function  createUser(newUserData) {
+        var newUser = new mvUser(newUserData);
+        var dfd = $q.defer();
+
+        newUser.$save().then(function() {
+            identity.currentUser = newUser;
+            dfd.resolve();
+        }, function(response) {
+            console.log("Front auth error: " +response);
+            dfd.reject(response.data.reason)
+        });
+        return dfd.promise;
+    }
+
+    function updateCurrentUser(newUserData) {
+        var dfd = $q.defer();
+
+        var clone = angular.copy(identity.currentUser);
+        angular.extend(clone, newUserData);
+        clone.$update().then(function() {
+            identity.currentUser = clone;
+            dfd.resolve();
+        }, function(response) {
+            dfd.reject(response.data.reason)
+        });
+        return dfd.promise;
+    }
+
 }

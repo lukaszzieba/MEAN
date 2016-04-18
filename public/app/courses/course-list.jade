@@ -1,0 +1,10 @@
+.container
+    table.table
+        thead
+            tr
+                th Title
+                th Publish date
+        tbody
+            tr(ng-repeat="course in courses")
+                td {{ course.title }}
+                td {{ course.published | date }}

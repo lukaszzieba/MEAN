@@ -5,9 +5,11 @@ angular
 MainController.$inject = ['$scope', '$location' , 'notifier', 'auth', 'identity'];
 
 function AccountController($scope, $location, notifier, auth, identity) {
-
+    console.log(auth)
     $scope.user = {};
     $scope.identity = identity;
+
+    console.log(identity.currentUser);
 
     $scope.signIn = function () {
         auth.authenticateUser($scope.user.username, $scope.user.password)
